@@ -1,0 +1,115 @@
+:root {
+  color-scheme: light;
+  --bg: #008080;
+  --panel: #c0c0c0;
+  --panel-dark: #808080;
+  --panel-light: #ffffff;
+  --text: #000;
+  --blue: #000080;
+  --shadow: #404040;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
+  color: var(--text);
+  overflow-y: auto; /* позволяем скролл при переполнении */
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Центрирование основного контейнера рабочего стола */
+.desktop {
+  max-width: 1300px;
+  width: calc(100% - 20px);
+  margin: 20px auto;
+  height: auto;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 10px;
+  padding: 10px;
+  background: transparent; /* фон задаёт body */
+}
+
+/* Остальные стили (не изменяем, только добавляем центрирование контента) */
+.sidebar, .main-panel, .win98-window, .sidebar-panel, .card, .topbar {
+  background: var(--panel);
+  border: 2px solid;
+  border-color: var(--panel-light) var(--shadow) var(--shadow) var(--panel-light);
+  box-shadow: inset 1px 1px 0 #dfdfdf;
+}
+
+.sidebar { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.desktop-icon { font-weight: bold; font-size: 20px; text-align: center; background: linear-gradient(#000080, #000040); color: white; padding: 16px; border: 2px solid; border-color: #b0b0ff #202020 #202020 #b0b0ff; }
+.sidebar-panel { padding: 10px; }
+.sidebar-title { font-weight: bold; margin-bottom: 8px; }
+.sidebar-nav { display: flex; flex-direction: column; gap: 6px; }
+.sidebar-link, .topbar-link, .win98-tab { text-decoration: none; padding: 6px 10px; background: var(--panel); border: 2px solid; border-color: var(--panel-light) var(--shadow) var(--shadow) var(--panel-light); color: var(--text); }
+.sidebar-link.active, .win98-tab.active { border-color: var(--shadow) var(--panel-light) var(--panel-light) var(--shadow); }
+.main-panel { padding: 10px; overflow: auto; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 10px; position: sticky; top: 0; z-index: 1; }
+.win98-window { overflow: hidden; }
+.win98-titlebar { background: linear-gradient(90deg, #000080, #1084d0); color: white; padding: 4px 6px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+.win98-window-body { padding: 12px; }
+.win98-button, .win98-input, .win98-badge { font: inherit; }
+.win98-button { padding: 6px 10px; background: var(--panel); border: 2px solid; border-color: var(--panel-light) var(--shadow) var(--shadow) var(--panel-light); cursor: pointer; }
+.win98-button:active { border-color: var(--shadow) var(--panel-light) var(--panel-light) var(--shadow); }
+.win98-input { width: 100%; padding: 6px 8px; background: white; border: 2px solid; border-color: var(--shadow) var(--panel-light) var(--panel-light) var(--shadow); }
+.win98-label { font-size: 13px; font-weight: bold; }
+.win98-badge { display: inline-block; padding: 2px 6px; margin-top: 6px; background: #000080; color: white; }
+
+/* Центрирование форм и карточек внутри главной панели */
+.form-grid {
+  display: grid;
+  gap: 8px;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cards {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 800px;
+}
+
+.card { padding: 10px; }
+.card-head { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.error-box, .success-box { padding: 8px; border: 2px solid; margin: 8px auto; max-width: 600px; }
+.error-box { background: #ffdddd; border-color: #800000; }
+.success-box { background: #ddffdd; border-color: #006400; }
+.message-form, .topbar-link { margin-bottom: 10px; }
+.win98-tab { cursor: pointer; }
+.boot-screen { height: 100%; display: grid; place-items: center; color: white; font-size: 20px; }
+
+/* Адаптивность */
+@media (max-width: 900px) {
+  body { overflow-y: auto; }
+  .desktop {
+    grid-template-columns: 1fr;
+    height: auto;
+    margin: 10px auto;
+  }
+  .sidebar { order: 2; }
+  .main-panel { order: 1; }
+}
