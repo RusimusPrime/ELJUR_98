@@ -20,6 +20,8 @@ export function LoginPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const v = getValidationError({ email, password, full_name: 'ok' });
+    await login(email, password);
+      navigate('/');
     if (v) return setError(v);
     try {
       await login(email, password);
@@ -27,6 +29,7 @@ export function LoginPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка входа');
     }
+//  Когда будет бек убрать комментарии
   }
 
   return (

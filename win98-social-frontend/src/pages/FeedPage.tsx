@@ -5,8 +5,8 @@ import { Button, Window } from '../components/Win98';
 import { Link } from 'react-router-dom';
 
 export function FeedPage() {
-  const { token } = useAuth();
-  const { data, loading, error, reload } = useApiData(() => api.feed(token!), [token]);
+   const { token } = useAuth();
+   const { data, loading, error, reload } = useApiData(() => api.feed(token!), [token]);
 
   return (
     <Window title="Лента публикаций и событий" actions={<Button onClick={reload}>Обновить</Button>}>
