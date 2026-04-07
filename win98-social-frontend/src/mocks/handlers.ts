@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw'
 export const handlers = [
   http.post('http://localhost:8000/auth/login', async ({ request }) => {
     const { email, password } = await request.json()
-    if (email === 'ruslankosov9@gmail.com' && password === 'Zizi12') {
+    if (email === 'qwerty@gmail.com' && password === 'qwerty') {
       return HttpResponse.json({
         access_token: 'mock-jwt-token',
         user: { email, name: 'Руслан' }
