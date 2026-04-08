@@ -1,3 +1,15 @@
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('./fonts/Pac-Man1980-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+body, .sidebar, .main-panel, .win98-window {
+  font-family: 'MyCustomFont', 'MS Sans Serif', Tahoma, sans-serif;
+}
+
 :root {
   color-scheme: light;
   --bg: #008080;
@@ -33,7 +45,6 @@ body {
   justify-content: center;
 }
 
-/* Центрирование основного контейнера рабочего стола */
 .desktop {
   max-width: 1300px;
   width: calc(100% - 20px);
@@ -43,10 +54,9 @@ body {
   grid-template-columns: 260px 1fr;
   gap: 10px;
   padding: 10px;
-  background: transparent; /* фон задаёт body */
+  background: transparent;
 }
 
-/* Остальные стили (не изменяем, только добавляем центрирование контента) */
 .sidebar, .main-panel, .win98-window, .sidebar-panel, .card, .topbar {
   background: var(--panel);
   border: 2px solid;
@@ -73,7 +83,6 @@ body {
 .win98-label { font-size: 13px; font-weight: bold; }
 .win98-badge { display: inline-block; padding: 2px 6px; margin-top: 6px; background: #000080; color: white; }
 
-/* Центрирование форм и карточек внутри главной панели */
 .form-grid {
   display: grid;
   gap: 8px;
@@ -102,7 +111,6 @@ body {
 .win98-tab { cursor: pointer; }
 .boot-screen { height: 100%; display: grid; place-items: center; color: white; font-size: 20px; }
 
-/* Адаптивность */
 @media (max-width: 900px) {
   body { overflow-y: auto; }
   .desktop {
