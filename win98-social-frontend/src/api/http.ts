@@ -13,7 +13,9 @@ export class ApiError extends Error {
 
 async function parseResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type') || '';
-  const body = contentType.includes('application/json') ? await response.json().catch(() => null) : await response.text().catch(() => '');
+  const body = contentType.includes('application/json')
+    ? await response.json().catch(() => null)
+    : await response.text().catch(() => '');
 
   if (!response.ok) {
     const message =

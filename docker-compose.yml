@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - JWT_SECRET=change-me-in-production-use-a-long-random-secret
+      - DB_PATH=/app/data/app.db
+    volumes:
+      - backend-data:/app/data
+
+  frontend:
+    build:
+      context: ./win98-social-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  backend-data:

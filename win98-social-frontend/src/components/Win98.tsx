@@ -35,7 +35,3 @@ export function Label({ children }: { children: React.ReactNode }) {
 export function Badge({ children }: { children: React.ReactNode }) {
   return <span className="win98-badge">{children}</span>;
 }
-
-export function TabButton({ active, children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { active?: boolean }) {
-  return <button {...props} className={`win98-tab ${active ? 'active' : ''} ${props.className || ''}`.trim()}>{children}</button>;
-}

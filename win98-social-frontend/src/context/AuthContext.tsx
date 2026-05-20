@@ -9,10 +9,9 @@ type AuthState = {
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { full_name: string; email: string; password: string; role?: string; class_name?: string; subject?: string }) => Promise<void>;
+  register: (data: { full_name: string; email: string; password: string; role?: string }) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
-  setServerError: (msg: string | null) => void;
 };
 
 const STORAGE_KEY = 'eljur98.auth';
@@ -51,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(res.user);
   };
 
-  const register = async (data: { full_name: string; email: string; password: string; role?: string; class_name?: string; subject?: string }) => {
+  const register = async (data: { full_name: string; email: string; password: string; role?: string }) => {
     const res = await api.register(data);
     persistToken(res.access_token);
     setUser(res.user);
@@ -67,10 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(await api.me(token));
   };
 
-  const value = useMemo(
-    () => ({ user, token, loading, error, login, register, logout, refreshUser, setServerError: setError }),
-    [user, token, loading, error],
-  );
+  const value = useMemo(() => ({ user, token, loading, error, login, register, logout, refreshUser }), [user, token, loading, error]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

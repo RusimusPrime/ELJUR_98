@@ -2,18 +2,18 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Badge } from './Win98';
 
-const nav = [
+const baseNav = [
   { to: '/', label: 'Лента' },
-  { to: '/messages', label: 'Сообщения' },
+  { to: '/messages', label: 'Чаты' },
   { to: '/groups', label: 'Группы' },
   { to: '/search', label: 'Поиск' },
   { to: '/profile', label: 'Профиль' },
-  { to: '/admin', label: 'Админ' },
 ];
 
 export function AppLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const nav = user?.role === 'admin' ? [...baseNav, { to: '/admin', label: 'Админ' }] : baseNav;
 
   return (
     <div className="desktop">
@@ -22,6 +22,7 @@ export function AppLayout() {
         <div className="sidebar-panel">
           <div className="sidebar-title">Пользователь</div>
           <div>{user?.full_name}</div>
+          <div className="meta-line">ID: {user?.id ?? '—'}</div>
           <Badge>{user?.role ?? 'guest'}</Badge>
         </div>
         <nav className="sidebar-nav">

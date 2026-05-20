@@ -1,10 +1,11 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
+import { API_URL } from '../api/http';
+import { Button, Input, Textarea, Window } from '../components/Win98';
 import { useAuth } from '../context/AuthContext';
 import { useApiData } from '../hooks/useApiData';
-import { Button, Input, Textarea, Window } from '../components/Win98';
-import type { Group } from '../types';
+import type { Group, GroupMessage } from '../types';
 
 export function GroupsPage() {
   const { token } = useAuth();
@@ -12,7 +13,7 @@ export function GroupsPage() {
   const { data, error, reload } = useApiData(() => api.groups(token!, q), [token, q]);
 
   return (
-    <Window title="Группы" actions={<Link to="/groups/new">Новая группа</Link>}>
+    <Window title="Группы" actions={<Link className="topbar-link" to="/groups/new">Новая группа</Link>}>
       <div className="toolbar">
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию" />
         <Button onClick={reload}>Искать</Button>
@@ -23,7 +24,8 @@ export function GroupsPage() {
           <article className="card" key={g.id}>
             <h3>{g.name}</h3>
             <p>{g.description}</p>
-            <Link to={`/groups/${g.id}`}>Открыть</Link>
+            <small>{g.subscribers_count ?? 0} участников</small>
+            <div className="toolbar"><Link to={`/groups/${g.id}`}>Открыть чат</Link></div>
           </article>
         ))}
       </div>
@@ -64,42 +66,45 @@ export function GroupEditorPage() {
 }
 
 export function GroupDetailPage() {
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const { id } = useParams();
   const { data: group, error, reload } = useApiData(() => api.groupById(token!, id!), [token, id]);
-  const { data: posts, reload: reloadPosts } = useApiData(() => api.groupPosts(token!, id!), [token, id]);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const { data: messages, reload: reloadMessages } = useApiData(() => api.groupMessages(token!, id!), [token, id]);
+  const [draft, setDraft] = useState('');
+  const [status, setStatus] = useState<string | null>(null);
 
-  async function createPost() {
-    if (!title.trim() || !content.trim()) return;
-    await api.createPost(token!, id!, { title, content });
-    setTitle('');
-    setContent('');
-    await reloadPosts();
+  async function sendMessage(e: FormEvent) {
+    e.preventDefault();
+    if (!draft.trim()) return;
+    try {
+      await api.sendGroupMessage(token!, id!, draft);
+      setDraft('');
+      await reloadMessages();
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : 'Не удалось отправить сообщение');
+    }
   }
 
   return (
     <Window title={group?.name || 'Группа'} actions={<Button onClick={reload}>Обновить</Button>}>
       {error && <div className="error-box">{error}</div>}
+      {status && <div className="success-box">{status}</div>}
       <p>{group?.description}</p>
-      <div className="toolbar">
-        <Button onClick={() => api.joinGroup(token!, id!).then(reload)}>Подписаться</Button>
-        <Button onClick={() => api.leaveGroup(token!, id!).then(reload)}>Отписаться</Button>
+
+      <div className="card messenger-thread">
+        <h3>Чат группы</h3>
+        <form onSubmit={sendMessage} className="message-compose">
+          <Textarea value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Написать сообщение" />
+          <Button type="submit">Отправить</Button>
+        </form>
       </div>
-      {user && <div className="card">
-        <h3>Создать публикацию</h3>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Заголовок" />
-        <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Текст" />
-        <Button onClick={createPost}>Опубликовать</Button>
-      </div>}
-      <div className="cards">
-        {posts?.items?.map((post) => (
-          <article className="card" key={post.id}>
-            <h3>{post.title}</h3>
-            <small>{post.author.full_name}</small>
-            <p>{post.content}</p>
-            <Link to={`/posts/${post.id}`}>Комментарии ({post.comments_count ?? 0})</Link>
+
+      <div className="cards message-stack">
+        {messages?.items?.map((message: GroupMessage) => (
+          <article className="chat-bubble incoming" key={message.id}>
+            <div className="chat-meta">{message.sender.full_name} · ID {message.sender.id}</div>
+            <div>{message.content}</div>
+            <small>{new Date(message.created_at).toLocaleString()}</small>
           </article>
         ))}
       </div>

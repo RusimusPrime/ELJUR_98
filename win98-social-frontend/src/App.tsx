@@ -6,13 +6,18 @@ import { FeedPage } from './pages/FeedPage';
 import { GroupDetailPage, GroupEditorPage, GroupsPage } from './pages/GroupsPages';
 import { LoginPage, RegisterPage } from './pages/AuthPages';
 import { MessagesPage } from './pages/MessagesPage';
-import { PostPage } from './pages/PostPage';
 import { AdminPage, ProfilePage, SearchPage } from './pages/ProfileSearchAdminPages';
 
 function Protected({ children }: { children: React.ReactElement }) {
   const { token, loading } = useAuth();
   if (loading) return <div className="boot-screen">Loading ELJUR 98...</div>;
   if (!token) return <Navigate to="/login" replace />;
+  return children;
+}
+
+function AdminOnly({ children }: { children: React.ReactElement }) {
+  const { user } = useAuth();
+  if (user?.role !== 'admin') return <Navigate to="/" replace />;
   return children;
 }
 
@@ -27,11 +32,9 @@ export function App() {
         <Route path="groups" element={<GroupsPage />} />
         <Route path="groups/new" element={<GroupEditorPage />} />
         <Route path="groups/:id" element={<GroupDetailPage />} />
-        <Route path="groups/:id/edit" element={<GroupEditorPage />} />
-        <Route path="posts/:id" element={<PostPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="search" element={<SearchPage />} />
-        <Route path="admin" element={<AdminPage />} />
+        <Route path="admin" element={<AdminOnly><AdminPage /></AdminOnly>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
