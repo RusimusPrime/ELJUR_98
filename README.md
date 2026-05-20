@@ -9,12 +9,9 @@ docker compose down -v
 docker compose up --build
 ```
 
-Открывай:
+Ссылки:
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:8000
 - Docs: http://localhost:8000/docs
 
-## Создание аккаунта администратора
-
-На странице регистрации выбери роль `admin`.

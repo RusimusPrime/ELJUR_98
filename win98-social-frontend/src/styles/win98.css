@@ -22,16 +22,7 @@ body {
   font-family: 'MS Sans Serif', Tahoma, sans-serif;
   overflow-y: auto;
 }
-@font-face {
-  font-family: 'MyCustomFont';
-  src: url('./fonts/Pac-Man1980-Regular.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-body, .sidebar, .main-panel, .win98-window {
-  font-family: 'MyCustomFont', 'MS Sans Serif', Tahoma, sans-serif;
-}
+
 
 #root {
   width: 100%;

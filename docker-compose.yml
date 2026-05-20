@@ -2,23 +2,36 @@ services:
   backend:
     build:
       context: ./backend
+
     ports:
       - "8000:8000"
+
     environment:
-      - JWT_SECRET=change-me-in-production-use-a-long-random-secret
+      - JWT_SECRET=I_LIKE_TRANSFORMERS
       - DB_PATH=/app/data/app.db
+
     volumes:
       - backend-data:/app/data
+
+    healthcheck:
+      test: [ "CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\"" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   frontend:
     build:
       context: ./win98-social-frontend
+
     ports:
       - "5173:5173"
+
     environment:
       - VITE_API_URL=http://localhost:8000
+
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   backend-data:

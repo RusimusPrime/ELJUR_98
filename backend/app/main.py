@@ -110,7 +110,7 @@ def on_startup():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"ok": True}
 
 
 @app.post("/auth/register", response_model=AuthResponse)
@@ -293,34 +293,81 @@ async def ws_chat(websocket: WebSocket, chat_id: str):
     try:
         payload = decode_token(token)
         user_id = int(payload.get("sub"))
-    except Exception:
+    except Exception as e:
+        print("TOKEN ERROR:", e)
         await websocket.close(code=4401)
         return
 
+    # Проверка пользователя и доступа к чату
     with connect() as db:
-        user = row(db, "SELECT id, full_name, email, role, bio, avatar_url FROM users WHERE id = ?", (user_id,))
+        user = row(
+            db,
+            "SELECT id, full_name, email, role, bio, avatar_url FROM users WHERE id = ?",
+            (user_id,)
+        )
+
         if not user:
             await websocket.close(code=4401)
             return
-        if not row(db, "SELECT 1 FROM chat_participants WHERE chat_id = ? AND user_id = ?", (chat_id, user_id)):
+
+        allowed = row(
+            db,
+            "SELECT 1 FROM chat_participants WHERE chat_id = ? AND user_id = ?",
+            (chat_id, user_id)
+        )
+
+        if not allowed:
             await websocket.close(code=4403)
             return
 
     room = f"chat:{chat_id}"
     await manager.connect(room, websocket)
+
     try:
         while True:
-            data = await websocket.receive_json()
-            content = str(data.get("content", "")).strip()
-            if not content:
-                await websocket.send_json({"type": "error", "message": "Пустое сообщение"})
+            # -------- RECEIVE --------
+            try:
+                data = await websocket.receive_json()
+            except WebSocketDisconnect:
+                print("WS DISCONNECT (receive loop)")
+                break
+
+            if not isinstance(data, dict):
                 continue
-            with connect() as db:
-                message = send_chat_message(db, user, chat_id, content)
-            await manager.broadcast(room, {"type": "message", "message": message})
+
+            content = str(data.get("content", "")).strip()
+
+            if not content:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Пустое сообщение"
+                })
+                continue
+
+            # -------- SAVE + BROADCAST --------
+            try:
+                with connect() as db:
+                    message = send_chat_message(db, user, chat_id, content)
+
+                await manager.broadcast(room, {
+                    "type": "message",
+                    "message": message
+                })
+
+            except Exception as e:
+                print("SEND MESSAGE ERROR:", e)
+                await websocket.send_json({
+                    "type": "error",
+                    "message": str(e)
+                })
+
     except WebSocketDisconnect:
-        manager.disconnect(room, websocket)
-    except Exception:
+        print("WS DISCONNECT:", chat_id)
+
+    except Exception as e:
+        print("WS FATAL ERROR:", e)
+
+    finally:
         manager.disconnect(room, websocket)
         try:
             await websocket.close()
